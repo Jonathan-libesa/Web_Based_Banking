@@ -84,7 +84,7 @@ while ($auth = $res->fetch_object()) {
 
           <div class="row">
               <div class="col">
-                <p><a href="forget-password.php"> Forgot Password ?</p>
+                <p><a href="recover_psw.php"> Forgot Password ?</p>
               </div>
           </div>
 

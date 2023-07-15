@@ -205,7 +205,7 @@ if (isset($_POST['change_client_password'])) {
                                     <div class="card-header p-2">
                                         <ul class="nav nav-pills">
                                             <li class="nav-item"><a class="nav-link active" href="#update_Profile" data-toggle="tab">Update Profile</a></li>
-                                            <li class="nav-item"><a class="nav-link" href="forget-password.php">Change Password</a></li>
+                                            <li class="nav-item"><a class="nav-link" href="recover_psw.php">Change Password</a></li>
                                         </ul>
                                     </div><!-- /.card-header -->
                                     <div class="card-body">

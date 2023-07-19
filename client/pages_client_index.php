@@ -56,7 +56,7 @@ while ($auth = $res->fetch_object()) {
                   <span class="fas fa-lock"></span>
                 </div>
               </div>
-            </div>
+            </div> 
             <div class="row">
               <div class="col-8">
                 <div class="icheck-primary">

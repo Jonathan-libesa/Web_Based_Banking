@@ -19,9 +19,11 @@ if (isset($_POST['withdrawal'])) {
     $client_national_id  = $_POST['client_national_id'];
     $transaction_amt = $_POST['transaction_amt'];
     $client_phone = $_POST['client_phone'];
+    $Pin= sha1(md5($_POST['Pin'])); 
     //$acc_new_amt = $_POST['acc_new_amt'];
     //$notification_details = $_POST['notification_details'];
     $notification_details = "$client_name Has Withdrawn $ $transaction_amt From Bank Account $account_number";
+
 
     /*
     * The below code will handle the withdrwawal process that is first it 
@@ -37,10 +39,29 @@ if (isset($_POST['withdrawal'])) {
     $stmt->bind_result($amt);
     $stmt->fetch();
     $stmt->close();
+    //PIN AUTHETICATION
+      $stmt = $mysqli->prepare("SELECT Pin  FROM ib_bankaccounts   WHERE account_id=?"); //sql to log in user
+      $stmt->bind_param('s',$account_id); //bind fetched parameters
+      $stmt->execute(); //execute bind
+      $stmt->bind_result($pin ); //bind result
+      $stmt->fetch();
+      $stmt->close();
+      //$rs = $stmt->fetch();
+    //$_SESSION['client_id'] = $client_id;
+       //if ($rs) { //if its sucessfull
+       // $err = "Please Check Your Pin";
+      //} else {
+        //$success = " Funds Withdrawled";
+      //}
+
+    if ( $Pin !== $pin ) {
+        $err = "Please Check Your Pin";
+      
 
 
-    if ($transaction_amt > $amt) {
-        $err = "You Do Not Have Sufficient Funds In Your Account.Your Existing Amount is $ $amt";
+    }elseif ($transaction_amt > $amt) {
+          $err = "You Do Not Have Sufficient Funds In Your Account.Your Existing Amount is $ $amt";
+        
     } else {
 
 
@@ -204,7 +225,12 @@ if (isset($_POST['withdrawal'])) {
                                                     <label for="exampleInputPassword1">Transaction Status</label>
                                                     <input type="text" name="tr_status" value="Success " required class="form-control" id="exampleInputEmail1">
                                                 </div>
-
+                                                  <div class="col-md-2 form-group">
+                                                    <label for="exampleInputPassword1">Enter Pin</label>
+                                                       <input type="password" name="Pin" class="form-control" placeholder="PIN" required autofocus>
+                                                           <div class="input-group-append">
+                                                        </div>
+                                                  </div>
                                             </div>
 
                                         </div>

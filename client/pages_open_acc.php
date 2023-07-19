@@ -20,12 +20,13 @@ if (isset($_POST['open_account'])) {
     $client_number = $_POST['client_number'];
     $client_email  = $_POST['client_email'];
     $client_adr  = $_POST['client_adr'];
+    $Pin         = sha1(md5($_POST['Pin']));
 
     //Insert Captured information to a database table
-    $query = "INSERT INTO iB_bankAccounts (acc_name, account_number, acc_type, acc_rates, acc_status, acc_amount, client_id, client_name, client_national_id, client_phone, client_number, client_email, client_adr) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)";
+    $query = "INSERT INTO iB_bankAccounts (acc_name, account_number, acc_type, acc_rates, acc_status, acc_amount, client_id, client_name, client_national_id, client_phone, client_number, client_email, client_adr,Pin) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
     $stmt = $mysqli->prepare($query);
     //bind paramaters
-    $rc = $stmt->bind_param('sssssssssssss', $acc_name, $account_number, $acc_type, $acc_rates, $acc_status, $acc_amount, $client_id, $client_name, $client_national_id, $client_phone, $client_number, $client_email, $client_adr);
+    $rc = $stmt->bind_param('ssssssssssssss', $acc_name, $account_number, $acc_type, $acc_rates, $acc_status, $acc_amount, $client_id, $client_name, $client_national_id, $client_phone, $client_number, $client_email, $client_adr,$Pin );
     $stmt->execute();
 
     //declare a varible which will be passed to alert function
@@ -184,6 +185,14 @@ if (isset($_POST['open_account'])) {
                                                     <input type="text" name="account_number" value="<?php echo $_accnumber; ?>" required class="form-control" id="exampleInputEmail1">
                                                 </div>
                                             </div>
+                                            <div class="col-md-6 form-group">
+                                            <label for="exampleInputEmail1">Enter Your Pin No</label>
+                                          <input type="password" name="Pin" required class="form-control" placeholder="Pin" required class="form-control">
+                                          <div class="input-group-append">
+                                         </div>
+                
+              </div>
+            </div>
                                         </div>
                                         <!-- /.card-body -->
                                         <div class="card-footer">

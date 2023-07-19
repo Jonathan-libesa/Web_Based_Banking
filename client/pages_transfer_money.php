@@ -3,6 +3,7 @@ session_start();
 include('conf/config.php');
 include('conf/checklogin.php');
 check_login();
+
 $client_id = $_SESSION['client_id'];
 
 if (isset($_POST['deposit'])) {
@@ -19,7 +20,8 @@ if (isset($_POST['deposit'])) {
     $client_national_id  = $_POST['client_national_id'];
     $transaction_amt = $_POST['transaction_amt'];
     $client_phone = $_POST['client_phone'];
-
+    $Pin= sha1(md5($_POST['Pin'])); 
+    //$Pin          = sha1(md5($_POST['Pin']));
     //Few fields to hold funds transfers
     $receiving_acc_no = $_POST['receiving_acc_no'];
     $receiving_acc_name = $_POST['receiving_acc_name'];
@@ -29,10 +31,17 @@ if (isset($_POST['deposit'])) {
     $notification_details = "$client_name Has Transfered $ $transaction_amt From Bank Account $account_number To Bank Account $receiving_acc_no";
 
 
-    /*
-            *You cant transfer money from an bank account that has no money in it so
-            *Lets Handle that here.
-            */
+    //PIN AUTHETICATION
+    $stmt = $mysqli->prepare("SELECT Pin  FROM ib_bankaccounts   WHERE account_id=?"); //sql to log in user
+    $stmt->bind_param('d',$account_id); //bind fetched parameters
+    $stmt->execute(); //execute bind
+    $stmt->bind_result($pin ); //bind result
+    $stmt->fetch();
+    $stmt->close();
+  
+    //*You cant transfer money from an bank account that has no money in it so
+    //*Lets Handle that here.
+            
     $result = "SELECT SUM(transaction_amt) FROM  iB_Transactions  WHERE account_id=?";
     $stmt = $mysqli->prepare($result);
     $stmt->bind_param('i', $account_id);
@@ -40,16 +49,20 @@ if (isset($_POST['deposit'])) {
     $stmt->bind_result($amt);
     $stmt->fetch();
     $stmt->close();
+    
+  
+
+   if ( $Pin !== $pin ) {
+        $err = "Please Check Your Pin";
+      
 
 
-
-
-    if ($transaction_amt > $amt) {
-        $transaction_error  =  "You Do Not Have Sufficient Funds In Your Account For Transfer Your Current Account Balance Is $ $amt";
+    }elseif ($transaction_amt > $amt) {
+          $err = "You Do Not Have Sufficient Funds In Your Account.Your Existing Amount is $ $amt";
+        
     } else {
 
-
-        //Insert Captured information to a database table
+   //Insert Captured information to a database table
         $query = "INSERT INTO iB_Transactions (tr_code, account_id, acc_name, account_number, acc_type,  tr_type, tr_status, client_id, client_name, client_national_id, transaction_amt, client_phone, receiving_acc_no, receiving_acc_name, receiving_acc_holder) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
         $notification = "INSERT INTO  iB_notifications (notification_details) VALUES (?)";
 
@@ -63,7 +76,6 @@ if (isset($_POST['deposit'])) {
         $stmt->execute();
         $notification_stmt->execute();
 
-
         //declare a varible which will be passed to alert function
         if ($stmt && $notification_stmt) {
             $success = "Money Transfered";
@@ -72,10 +84,11 @@ if (isset($_POST['deposit'])) {
         }
     }
 }
-
+ 
 
 
 ?>
+
 <!-- Log on to codeastro.com for more projects! -->
 <!DOCTYPE html>
 <html>
@@ -103,6 +116,7 @@ if (isset($_POST['deposit'])) {
         while ($row = $res->fetch_object()) {
 
         ?>
+      
             <div class="content-wrapper">
                 <!-- Content Header (Page header) -->
                 <section class="content-header">
@@ -223,7 +237,13 @@ if (isset($_POST['deposit'])) {
                                                     <label for="exampleInputPassword1">Transaction Status</label>
                                                     <input type="text" name="tr_status" value="Success " required class="form-control" id="exampleInputEmail1">
                                                 </div>
-
+                                                <div class="col-md-2 form-group">
+                                                    <label for="exampleInputPassword1">Enter Pin</label>
+                                                    <input type="password" name="Pin" class="form-control" placeholder="PIN" required autofocus>
+                                                    <i class="bi bi-eye-slash" id="togglePassword"></i>
+                                                           <div class="input-group-append">
+                                                        </div>
+                                                 </div>
                                             </div>
 
                                         </div>
@@ -260,6 +280,19 @@ if (isset($_POST['deposit'])) {
     <script src="dist/js/adminlte.min.js"></script>
     <!-- AdminLTE for demo purposes -->
     <script src="dist/js/demo.js"></script>
+    <script>
+    const toggle = document.getElementById('togglePassword');
+    const password = document.getElementById('password');
+
+            toggle.addEventListener('click', function(){
+                if(password.type === "password"){
+                    password.type = 'text';
+                }else{
+                    password.type = 'password';
+                }
+                this.classList.toggle('bi-eye');
+            });
+    </script>
     <script type="text/javascript">
         $(document).ready(function() {
             bsCustomFileInput.init();

@@ -104,7 +104,7 @@ $client_id = $_SESSION['client_id'];
                                                             <i class="fas fa-eye"></i>
                                                             <i class="fas fa-money-bill-alt"></i>
                                                             Check Balance
-                                                        </a>
+                                                        </a> 
 
                                                     </td>
 
